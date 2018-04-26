@@ -1,0 +1,21 @@
+<job id="ZTIRenameComputer">
+	<script language="VBScript" src="ZTIUtility.vbs"/> 'needed
+	<script language="VBScript">
+
+' The below variable will be used in the next For Each statement.
+Dim newComputerName, oldComputerName, objShell, command, WshNetwork
+
+'Getting the computer
+newComputerName = """" NEW_COMPUTERNAME """"
+	
+'Current ComputerName
+Set WshNetwork = CreateObject("Wscript.Network")
+oldComputerName = """" & WshNetwork.ComputerName & """"
+
+Set objShell = WScript.CreateObject ("WScript.shell")
+command = "cmd /c wmic ComputerSystem where Name=" & oldComputerName & " call Rename Name=" & newComputerName
+objShell.Run command, 0, True
+Set objShell = Nothing
+
+	</script>
+</job>
