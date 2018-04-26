@@ -1,0 +1,35 @@
+<job id="ZTIEnableAdmin">
+	<script language="VBScript" src="ZTIUtility.vbs"/> 'needed
+	<script language="VBScript">
+
+'VAR
+Dim objWMI, AdminAccount, strPassword
+
+
+'MDT -> strPassword = oEnvironment.Item("AdminPassword")
+'Hard coded -> strPassword = "YOUR_PASSWORD"
+
+'WMI Request
+Set oContext = CreateObject("WbemScripting.SWbemNamedValueSet")
+	oContext.Add "__ProviderArchitecture", 64
+	Set oLocator = CreateObject("Wbemscripting.SWbemLocator")
+	Set objWMI = oLocator.ConnectServer("","root\cimv2","","",,,,oContext)
+
+'Getting all local accounts
+Set colUserAccounts = objWMI.ExecQuery ("Select * from Win32_UserAccount where LocalAccount = TRUE")
+
+For Each oAccount in colUserAccounts
+	'Looking for Administrator
+	If Left(oAccount.SID, 6) = "S-1-5-" and Right(oAccount.SID, 4) = "-500" Then
+	AdminAccount = oAccount.Name
+	Set objUser = GetObject("WinNT://./" & AdminAccount & ",user")
+	'Activate
+	objUser.AccountDisabled = False
+	'Password
+	objUser.SetPassword strPassword
+	'Save
+	objUser.SetInfo
+	End iF
+Next
+</script>
+</job>
